@@ -1,0 +1,53 @@
+---
+- name: Enable required modules
+  apache2_module:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - proxy
+    - proxy_fcgi
+  notify: reload apache2
+
+- name: Always disable mod PHP
+  apache2_module:
+    name: "php{{ php7_distro_version }}"
+    state: absent
+  notify: reload apache2
+
+- name: Uninstall unwanted Apache2 modules
+  apt:
+    name:
+      - "libapache2-mod-fastcgi"
+      - "libapache2-mod-php*"
+    state: absent
+
+- name: Enable global php socket if required
+  command:
+    cmd: "a2enconf php{{ php7_distro_version }}-fpm"
+    creates: "/etc/apache2/conf-enabled/php{{ php7_distro_version }}-fpm.conf"
+  notify: reload apache2
+  when: apache2_php_config_php_enabled|bool
+
+- name: Disable global php socket if required
+  command:
+    cmd: "a2disconf php{{ php7_distro_version }}-fpm"
+    removes: "/etc/apache2/conf-enabled/php{{ php7_distro_version }}-fpm.conf"
+  notify: reload apache2
+  when: not apache2_php_config_php_enabled|bool
+
+- name: Ensure mpm prefork and event module are disabled
+  apache2_module:
+    state: absent
+    name: "{{ item }}"
+    ignore_configcheck: true
+  with_items:
+    - mpm_prefork
+    - mpm_event
+  notify: restart apache2
+
+- name: Enable mpm_worker
+  apache2_module:
+    state: present
+    name: mpm_worker
+    ignore_configcheck: true
+  notify: restart apache2

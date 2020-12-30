@@ -1,0 +1,4 @@
+---
+# description: Enable the default PHP fpm socket for all virtualhosts
+# type: bool
+apache2_php_config_php_enabled: false

@@ -1,0 +1,28 @@
+---
+galaxy_info:
+  author: Luc Stroobant
+  description: Configure PHP with mod fastcgi for Apache2
+
+  license: MIT
+
+  min_ansible_version: 2.8
+
+  platforms:
+    - name: Debian
+      version:
+        - 9
+        - 10
+    - name: Ubuntu
+      version:
+        - 18
+        - 20
+
+  galaxy_tags:
+    - fiaasco
+    - apache2
+    - php
+    - fpm
+
+dependencies:
+  - fiaasco.apache2
+  - fiaasco.php7

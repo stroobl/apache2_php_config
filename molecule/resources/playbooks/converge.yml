@@ -1,0 +1,21 @@
+---
+- name: Converge
+  hosts: all
+  gather_facts: true
+  roles:
+    - role: apache2_php_config
+
+  post_tasks:
+    - name: create phpinfo file in documentroot for testing
+      copy:
+        content: |
+          <?php phpinfo(); ?>
+        dest: /var/www/html/index.php
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: remove default index.html
+      file:
+        path: /var/www/html/index.html
+        state: absent
